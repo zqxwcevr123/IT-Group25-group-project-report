@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .calendar {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .calendar-header {
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .calendar-cell {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .custom-text {
+            color: var(--font-color, #000000); /* Default font color */
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            To-Do List
+        </div>
+        <div class="calendar-row">
+            <div class="calendar-cell">
+                <input type="text" id="todo-input" placeholder="Enter a to-do">
+                <input type="date" id="todo-date">
+                <input type="color" id="font-color" value="#000000">
+                <button onclick="addTodo()">Add</button>
+            </div>
+        </div>
+        <div class="calendar-row">
+            <div class="calendar-cell">
+                <ul id="todo-list" class="todo-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+
+        // Function to add a new to-do
+        function addTodo() {
+            const todoText = document.getElementById("todo-input").value.trim();
+            const todoDate = document.getElementById("todo-date").value;
+            const fontColor = document.getElementById("font-color").value;
+
+            if (!todoText) {
+                alert("Please enter a to-do item.");
+                return;
+            }
+
+            if (!todoDate) {
+                alert("Please select a date for the to-do item.");
+                return;
+            }
+
+            const newTodo = {
+                id: Date.now().toString(),
+                text: todoText,
+                completed: false,
+                date: todoDate,
+                fontColor: fontColor
+            };
+
+            todos.push(newTodo);
+            renderTodos();
+            showMessage("To-do added successfully!");
+        }
+
+        // Function to delete a to-do
+        function deleteTodo(index) {
+            todos.splice(index, 1);
+            renderTodos();
+            showMessage("To-do deleted successfully.");
+        }
+
+        // Function to edit a to-do
+        function editTodo(index) {
+            const newText = prompt("Edit your to-do", todos[index].text);
+            if (newText) {
+                todos[index].text = newText.trim();
+                renderTodos();
+                showMessage("To-do updated successfully.");
+            }
+        }
+
+        // Function to render the to-do list
+        function renderTodos() {
+            const todoList = document.getElementById("todo-list");
+            todoList.innerHTML = "";
+
+            todos.forEach((todo, index) => {
+                const todoItem = document.createElement("li");
+
+                const todoText = document.createElement("span");
+                todoText.textContent = todo.text + " ";
+                todoItem.appendChild(todoText);
+
+                const todoDate = document.createElement("span");
+                todoDate.textContent = " (Due: " + todo.date + ")";
+                todoItem.appendChild(todoDate);
+
+                todoItem.classList.add("custom-text"); // Apply custom text color
+                todoItem.style.setProperty("--font-color", todo.fontColor);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", () => deleteTodo(index));
+                todoItem.appendChild(deleteButton);
+
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.addEventListener("click", () => editTodo(index));
+                todoItem.appendChild(editButton);
+
+                todoList.appendChild(todoItem);
+            });
+        }
+
+        // Function to show message
+        function showMessage(message) {
+            alert(message);
+        }
+
+        // Initial rendering of the to-do list
+        renderTodos();
+    </script>
+</body>
+</html>
